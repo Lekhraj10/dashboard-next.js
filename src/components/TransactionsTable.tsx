@@ -10,6 +10,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface Transaction {
   id: number;
@@ -53,26 +61,58 @@ const TransactionsTable: React.FC = () => {
 
   return (
     <div className="w-full">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {paginatedTransactions.map((tx) => (
-            <TableRow key={tx.id}>
-              <TableCell>{tx.name}</TableCell>
-              <TableCell>{tx.amount}</TableCell>
-              <TableCell>{tx.date}</TableCell>
+      {/* Transactions Table */}
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Date</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {paginatedTransactions.map((tx) => (
+              <TableRow key={tx.id}>
+                <TableCell>{tx.name}</TableCell>
+                <TableCell>{tx.amount}</TableCell>
+                <TableCell>{tx.date}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      {/* Pagination Controls at Bottom */}
+      {/* Line Chart */}
+      <div className="w-full h-64 mt-6 sm:h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={transactions.map((tx) => ({
+              date: new Date(tx.date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              }), // Format: "Mar 1"
+              amount: parseFloat(tx.amount.replace("$", "")), // Convert "$100" to 100
+            }))}
+          >
+            <XAxis dataKey="date" />
+            <YAxis domain={[0, "auto"]} />
+            <Tooltip
+              contentStyle={{ backgroundColor: "white", borderRadius: "8px" }}
+              labelStyle={{ fontWeight: "bold" }}
+            />
+            <Line
+              type="linear" // Use linear to make the line straight
+              dataKey="amount"
+              stroke="#8884d8"
+              strokeWidth={2}
+              dot={{ r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Pagination Controls */}
       <div className="flex justify-end items-center mt-4 space-x-2">
         {/* First Button */}
         <Button
